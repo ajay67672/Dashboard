@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Tracking — Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<aside class="sidebar" aria-label="Primary navigation">
+  <div class="brand">
+    <div class="brand-logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-5 3 3 5-6"/><circle cx="7" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="6" r="1.2" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Payment Tracking</div>
+      <div class="brand-sub">Engineers Console</div>
+    </div>
+  </div>
+
+  <nav aria-label="Workspace">
+    <div class="nav-label">Workspace</div>
+    <div class="nav">
+      <a href="#" class="nav-item active" data-view="dashboard">
+        <span class="nav-left">
+          <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </span>
+      </a>
+      <a href="#" class="nav-item" data-view="analytics">
+        <span class="nav-left">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-5 3 3 5-6"/></svg>
+          Analytics
+        </span>
+      </a>
+      <a href="#" class="nav-item" data-view="invoices">
+        <span class="nav-left">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
+          Invoices
+        </span>
+        <span class="nav-badge" id="navInvoiceCount">—</span>
+      </a>
+      <a href="#" class="nav-item" data-view="engineers">
+        <span class="nav-left">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Engineers
+        </span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="filter-box" aria-labelledby="filter-title">
+    <h2 id="filter-title">Quick filters</h2>
+    <div class="filter-group">
+      <label for="filterYear">Year</label>
+      <select id="filterYear"><option value="">All years</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filterType">Type</label>
+      <select id="filterType">
+        <option value="">AMC + Service</option>
+        <option value="AMC">AMC only</option>
+        <option value="Service">Service only</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filterRegion">Region</label>
+      <select id="filterRegion"><option value="">All regions</option></select>
+    </div>
+    <div class="filter-group">
+      <label for="filterEngineer">Engineer</label>
+      <select id="filterEngineer"><option value="">All engineers</option></select>
+    </div>
+  </div>
+</aside>
+
+<div class="main-shell">
+  <header class="topbar">
+    <label class="searchbar" for="globalSearch">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="globalSearch" type="search" placeholder="Search invoice, customer, engineer…" aria-label="Search" />
+    </label>
+    <div class="top-right">
+      <div class="sync-pill"><span class="pulse-dot"></span>Live</div>
+      <button class="ghost-btn" id="refreshData" type="button">↻ Refresh</button>
+      <button class="ghost-btn" id="themeToggle" type="button" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+    </div>
+  </header>
+
+  <main class="content" id="main">
+    <section id="view-dashboard" class="view-section active">
+      <section class="hero" aria-label="Overview">
+        <div class="eyebrow">Dashboard overview</div>
+        <h1>Payment Tracking — Field Engineers</h1>
+        <p>Live data from AMC &amp; Service invoice sheets. Tracks outstanding balances, ageing buckets, region distribution, and engineer-wise collection status.</p>
+      </section>
+
+      <section class="kpi-grid" aria-label="Key metrics">
+        <article class="kpi-card" style="--accent:var(--color-primary);">
+          <div class="kpi-head">
+            <span class="kpi-label">Total outstanding</span>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12M6 8h12M10 21L6 8M10 21l8-13M10 21h4"/></svg></div>
+          </div>
+          <div class="kpi-value" id="totalValue">—</div>
+          <div class="kpi-foot"><span class="kpi-sub">All invoices with balance > 0</span></div>
+          <div class="spark-wrap"><canvas id="sparkTotal"></canvas></div>
+        </article>
+        <article class="kpi-card" style="--accent:var(--color-success);">
+          <div class="kpi-head">
+            <span class="kpi-label">Total invoices</span>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></div>
+          </div>
+          <div class="kpi-value" id="totalInvoices">—</div>
+          <div class="kpi-foot"><span class="kpi-sub" id="rowCount">—</span></div>
+        </article>
+        <article class="kpi-card" style="--accent:var(--color-warning);">
+          <div class="kpi-head">
+            <span class="kpi-label">AMC outstanding</span>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="m12 22 8-4V6l-8-4-8 4v12l8 4Z"/><path d="m16 10-5 5-3-3"/></svg></div>
+          </div>
+          <div class="kpi-value" id="amcValue">—</div>
+          <div class="kpi-foot"><span class="kpi-sub" id="amcCount">—</span></div>
+        </article>
+        <article class="kpi-card" style="--accent:var(--color-error);">
+          <div class="kpi-head">
+            <span class="kpi-label">Service outstanding</span>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6-7.9 7.9-1.6-1.6a1 1 0 0 0-1.4 0L2 18.9 5.1 22l3.3-3.3a1 1 0 0 0 0-1.4l-1.1-1.1 7.9-7.9 1.1 1.1a1 1 0 0 0 1.4 0L22 5.1 18.9 2z"/></svg></div>
+          </div>
+          <div class="kpi-value" id="serviceValue">—</div>
+          <div class="kpi-foot"><span class="kpi-sub" id="serviceCount">—</span></div>
+        </article>
+      </section>
+
+      <section class="panel-grid" aria-label="Charts">
+        <article class="panel">
+          <div class="panel-head"><div><h3>Invoice value by month</h3><p>Outstanding balance trend across billing months</p></div></div>
+          <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>Region mix</h3><p>Outstanding by zone</p></div></div>
+          <div class="chart-wrap"><canvas id="regionChart"></canvas></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><h3>AMC vs Service</h3><p>Split by invoice type</p></div></div>
+          <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
+        </article>
+      </section>
+
+      <div class="bottom-grid">
+        <article class="panel ageing-panel" aria-labelledby="ageing-title">
+          <div class="panel-top">
+            <div><h3 id="ageing-title">Ageing buckets</h3><p>Overdue days distribution</p></div>
+          </div>
+          <div class="table-scroll">
+            <table aria-label="Ageing summary">
+              <thead><tr><th>Bucket</th><th>Count</th><th class="amount-cell">Value</th></tr></thead>
+              <tbody id="ageingTableBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel table-panel" aria-labelledby="invoice-title">
+          <div class="panel-top">
+            <div><h3 id="invoice-title">Invoice records</h3><p>All pending invoices — live data</p></div>
+            <span id="rowCount2"></span>
+          </div>
+          <div class="table-scroll">
+            <table aria-label="Invoice records">
+              <thead>
+                <tr>
+                  <th>Type</th><th>Date</th><th>Invoice #</th><th>Customer</th><th>Engineer</th><th>Region</th><th>Status</th><th class="amount-cell">Balance</th>
+                </tr>
+              </thead>
+              <tbody id="invoiceTableBody"><tr><td colspan="8" class="empty-state">Loading data…</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="view-analytics" class="view-section">
+      <div class="hero">
+        <div class="eyebrow">Analytics</div>
+        <h1>Analytics & Insights</h1>
+        <p>Ageing buckets, top engineers, and deeper performance breakdowns.</p>
+      </div>
+      <section class="kpi-grid" aria-label="Ageing metrics">
+        <article class="kpi-card" style="--accent:var(--color-success);"><div class="kpi-head"><span class="kpi-label">0–30 Days</span><div class="kpi-icon">⏱</div></div><div class="kpi-value" id="age0to30">—</div><div class="kpi-foot"><span class="kpi-sub" id="age0to30c">—</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-warning);"><div class="kpi-head"><span class="kpi-label">31–90 Days</span><div class="kpi-icon">⚠</div></div><div class="kpi-value" id="age31to90">—</div><div class="kpi-foot"><span class="kpi-sub" id="age31to90c">—</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-error);"><div class="kpi-head"><span class="kpi-label">90+ Days</span><div class="kpi-icon">!</div></div><div class="kpi-value" id="age90plus">—</div><div class="kpi-foot"><span class="kpi-sub" id="age90plusc">—</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-primary);"><div class="kpi-head"><span class="kpi-label">Avg Overdue Days</span><div class="kpi-icon">↗</div></div><div class="kpi-value" id="avgOverdue">—</div><div class="kpi-foot"><span class="kpi-sub">Across overdue invoices</span></div></article>
+      </section>
+
+      <section class="panel-grid" aria-label="Analytics charts">
+        <article class="panel"><div class="panel-head"><div><h3>Ageing bucket breakdown</h3><p>Outstanding value by overdue range</p></div></div><div class="chart-wrap"><canvas id="ageingChart"></canvas></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Priority split</h3><p>Invoice count by priority</p></div></div><div class="chart-wrap"><canvas id="priorityChart"></canvas></div></article>
+      </section>
+
+      <article class="panel table-panel" style="margin-bottom:1.5rem;">
+        <div class="panel-top"><div><h3>Top 10 engineers — highest outstanding</h3><p>Ranked by total outstanding balance</p></div></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>#</th><th>Engineer</th><th>Region</th><th>Invoices</th><th>AMC</th><th>Service</th><th>Avg Overdue Days</th><th class="amount-cell">Total Outstanding</th></tr></thead>
+            <tbody id="top10TableBody"><tr><td colspan="8" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel table-panel" style="margin-bottom:1.5rem;">
+        <div class="panel-top"><div><h3>Ageing bucket detail</h3><p>Full breakdown by overdue range</p></div></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Bucket</th><th>Count</th><th>AMC</th><th>Service</th><th class="amount-cell">Total Value</th></tr></thead>
+            <tbody id="ageingDetailBody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-invoices" class="view-section">
+      <div class="hero">
+        <div class="eyebrow">Invoices</div>
+        <h1>Invoice Details</h1>
+        <p>Full invoice list with AMC/Service filter, search, due date, overdue, priority, and payment status.</p>
+      </div>
+
+      <section class="kpi-grid" aria-label="Invoice metrics">
+        <article class="kpi-card" style="--accent:var(--color-primary);"><div class="kpi-head"><span class="kpi-label">Total invoices</span><div class="kpi-icon">#</div></div><div class="kpi-value" id="invTotalCount">—</div><div class="kpi-foot"><span class="kpi-sub">All visible invoices</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-warning);"><div class="kpi-head"><span class="kpi-label">AMC count</span><div class="kpi-icon">A</div></div><div class="kpi-value" id="invAmcCount">—</div><div class="kpi-foot"><span class="kpi-sub">AMC invoices</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-success);"><div class="kpi-head"><span class="kpi-label">Service count</span><div class="kpi-icon">S</div></div><div class="kpi-value" id="invServiceCount">—</div><div class="kpi-foot"><span class="kpi-sub">Service invoices</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-error);"><div class="kpi-head"><span class="kpi-label">Overdue invoices</span><div class="kpi-icon">!</div></div><div class="kpi-value" id="invOverdueCount">—</div><div class="kpi-foot"><span class="kpi-sub">Overdue by > 0 days</span></div></article>
+      </section>
+
+      <article class="panel" style="margin-bottom:1.25rem;">
+        <div class="panel-head"><div><h3>Invoice filters</h3><p>Filter by type, region, engineer, and status</p></div></div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(4, minmax(0,1fr)); margin-bottom:0;">
+          <div class="filter-group"><label for="invType">Type</label><select id="invType"><option value="">All</option><option value="AMC">AMC</option><option value="Service">Service</option></select></div>
+          <div class="filter-group"><label for="invRegion">Region</label><select id="invRegion"><option value="">All regions</option></select></div>
+          <div class="filter-group"><label for="invEngineer">Engineer</label><select id="invEngineer"><option value="">All engineers</option></select></div>
+          <div class="filter-group"><label for="invStatus">Status</label><select id="invStatus"><option value="">All</option><option value="Current">Current</option><option value="Pending">Pending</option><option value="Overdue">Overdue</option></select></div>
+        </div>
+      </article>
+
+      <article class="panel table-panel">
+        <div class="panel-top"><div><h3>Invoice records</h3><p>Complete invoice details</p></div><span id="invRowCount"></span></div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th><th>Date</th><th>Invoice #</th><th>Customer</th><th>Engineer</th><th>Region</th><th>Priority</th><th>Status</th><th>Due Date</th><th>Overdue By</th><th class="amount-cell">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTableBodyView"><tr><td colspan="11" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="view-engineers" class="view-section">
+      <div class="hero">
+        <div class="eyebrow">Engineers</div>
+        <h1>Engineer Performance</h1>
+        <p>Engineer-wise invoice count, outstanding balance, overdue analysis, and collection status.</p>
+      </div>
+
+      <section class="kpi-grid" aria-label="Engineer metrics">
+        <article class="kpi-card" style="--accent:var(--color-primary);"><div class="kpi-head"><span class="kpi-label">Total engineers</span><div class="kpi-icon">E</div></div><div class="kpi-value" id="totalEngineers">—</div><div class="kpi-foot"><span class="kpi-sub">Active with pending invoices</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-error);"><div class="kpi-head"><span class="kpi-label">Highest outstanding</span><div class="kpi-icon">₹</div></div><div class="kpi-value" id="highestEngVal">—</div><div class="kpi-foot"><span class="kpi-sub" id="highestEngName">—</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-warning);"><div class="kpi-head"><span class="kpi-label">Most overdue invoices</span><div class="kpi-icon">!</div></div><div class="kpi-value" id="mostOverdueCount">—</div><div class="kpi-foot"><span class="kpi-sub" id="mostOverdueName">—</span></div></article>
+        <article class="kpi-card" style="--accent:var(--color-success);"><div class="kpi-head"><span class="kpi-label">Avg per engineer</span><div class="kpi-icon">↗</div></div><div class="kpi-value" id="avgPerEngineer">—</div><div class="kpi-foot"><span class="kpi-sub">Average outstanding per engineer</span></div></article>
+      </section>
+
+      <article class="panel" style="margin-bottom:1.5rem;">
+        <div class="panel-head"><div><h3>Top 10 engineers — outstanding bar</h3><p>Visual comparison of outstanding balance</p></div></div>
+        <div class="chart-wrap" style="height:280px;"><canvas id="engineerBarChart"></canvas></div>
+      </article>
+
+      <article class="panel table-panel" style="margin-bottom:1.5rem;">
+        <div class="panel-top"><div><h3>All engineers detail</h3><p>Complete engineer-wise breakdown</p></div></div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Engineer</th><th>Region</th><th>Invoices</th><th>AMC Invoices</th><th>Service Invoices</th><th>Overdue Invoices</th><th>Avg Overdue Days</th><th class="amount-cell">Total Outstanding</th>
+              </tr>
+            </thead>
+            <tbody id="engineerTableBody"><tr><td colspan="9" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
