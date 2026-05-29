@@ -1,1 +1,1 @@
-This is my dashbaord
+This is my dashoard with simple HTML, CSS, JS
