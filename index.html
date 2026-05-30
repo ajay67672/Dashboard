@@ -96,94 +96,73 @@
 
   <main class="content" id="main">
     <section id="view-dashboard" class="view-section active">
-      <section class="hero" aria-label="Overview">
-        <div class="eyebrow">Dashboard overview</div>
-        <h1>Payment Tracking — Field Engineers</h1>
-        <p>Live data from AMC &amp; Service invoice sheets. Tracks outstanding balances, ageing buckets, region distribution, and engineer-wise collection status.</p>
-      </section>
+  <section class="hero" aria-label="Overview">
+    <div class="eyebrow">Dashboard overview</div>
+    <h1>Payment Tracking — Field Engineers</h1>
+  </section>
 
-      <section class="kpi-grid" aria-label="Key metrics">
-        <article class="kpi-card" style="--accent:var(--color-primary);">
-          <div class="kpi-head">
-            <span class="kpi-label">Total outstanding</span>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12M6 8h12M10 21L6 8M10 21l8-13M10 21h4"/></svg></div>
-          </div>
-          <div class="kpi-value" id="totalValue">—</div>
-          <div class="kpi-foot"><span class="kpi-sub">All invoices with balance > 0</span></div>
-          <div class="spark-wrap"><canvas id="sparkTotal"></canvas></div>
-        </article>
-        <article class="kpi-card" style="--accent:var(--color-success);">
-          <div class="kpi-head">
-            <span class="kpi-label">Total invoices</span>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></div>
-          </div>
-          <div class="kpi-value" id="totalInvoices">—</div>
-          <div class="kpi-foot"><span class="kpi-sub" id="rowCount">—</span></div>
-        </article>
-        <article class="kpi-card" style="--accent:var(--color-warning);">
-          <div class="kpi-head">
-            <span class="kpi-label">AMC outstanding</span>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="m12 22 8-4V6l-8-4-8 4v12l8 4Z"/><path d="m16 10-5 5-3-3"/></svg></div>
-          </div>
-          <div class="kpi-value" id="amcValue">—</div>
-          <div class="kpi-foot"><span class="kpi-sub" id="amcCount">—</span></div>
-        </article>
-        <article class="kpi-card" style="--accent:var(--color-error);">
-          <div class="kpi-head">
-            <span class="kpi-label">Service outstanding</span>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6-7.9 7.9-1.6-1.6a1 1 0 0 0-1.4 0L2 18.9 5.1 22l3.3-3.3a1 1 0 0 0 0-1.4l-1.1-1.1 7.9-7.9 1.1 1.1a1 1 0 0 0 1.4 0L22 5.1 18.9 2z"/></svg></div>
-          </div>
-          <div class="kpi-value" id="serviceValue">—</div>
-          <div class="kpi-foot"><span class="kpi-sub" id="serviceCount">—</span></div>
-        </article>
-      </section>
-
-      <section class="panel-grid" aria-label="Charts">
-        <article class="panel">
-          <div class="panel-head"><div><h3>Invoice value by month</h3><p>Outstanding balance trend across billing months</p></div></div>
-          <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
-        </article>
-        <article class="panel">
-          <div class="panel-head"><div><h3>Region mix</h3><p>Outstanding by zone</p></div></div>
-          <div class="chart-wrap"><canvas id="regionChart"></canvas></div>
-        </article>
-        <article class="panel">
-          <div class="panel-head"><div><h3>AMC vs Service</h3><p>Split by invoice type</p></div></div>
-          <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
-        </article>
-      </section>
-
-      <div class="bottom-grid">
-        <article class="panel ageing-panel" aria-labelledby="ageing-title">
-          <div class="panel-top">
-            <div><h3 id="ageing-title">Ageing buckets</h3><p>Overdue days distribution</p></div>
-          </div>
-          <div class="table-scroll">
-            <table aria-label="Ageing summary">
-              <thead><tr><th>Bucket</th><th>Count</th><th class="amount-cell">Value</th></tr></thead>
-              <tbody id="ageingTableBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
-            </table>
-          </div>
-        </article>
-
-        <article class="panel table-panel" aria-labelledby="invoice-title">
-          <div class="panel-top">
-            <div><h3 id="invoice-title">Invoice records</h3><p>All pending invoices — live data</p></div>
-            <span id="rowCount2"></span>
-          </div>
-          <div class="table-scroll">
-            <table aria-label="Invoice records">
-              <thead>
-                <tr>
-                  <th>Type</th><th>Date</th><th>Invoice #</th><th>Customer</th><th>Engineer</th><th>Region</th><th>Status</th><th class="amount-cell">Balance</th>
-                </tr>
-              </thead>
-              <tbody id="invoiceTableBody"><tr><td colspan="8" class="empty-state">Loading data…</td></tr></tbody>
-            </table>
-          </div>
-        </article>
+  <section class="kpi-grid" aria-label="Key metrics">
+    <article class="kpi-card" style="--accent:var(--color-primary);">
+      <div class="kpi-head">
+        <span class="kpi-label">Total outstanding</span>
+        <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12M6 8h12M10 21L6 8M10 21l8-13M10 21h4"/></svg></div>
       </div>
-    </section>
+      <div class="kpi-value" id="totalValue">—</div>
+      <div class="kpi-foot"><span class="kpi-sub">Outstanding balance</span></div>
+      <div class="spark-wrap"><canvas id="sparkTotal"></canvas></div>
+    </article>
+
+    <article class="kpi-card" style="--accent:var(--color-success);">
+      <div class="kpi-head">
+        <span class="kpi-label">Total invoices</span>
+        <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg></div>
+      </div>
+      <div class="kpi-value" id="totalInvoices">—</div>
+      <div class="kpi-foot"><span class="kpi-sub" id="rowCount">—</span></div>
+    </article>
+
+    <article class="kpi-card" style="--accent:var(--color-warning);">
+      <div class="kpi-head">
+        <span class="kpi-label">AMC outstanding</span>
+        <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="m12 22 8-4V6l-8-4-8 4v12l8 4Z"/><path d="m16 10-5 5-3-3"/></svg></div>
+      </div>
+      <div class="kpi-value" id="amcValue">—</div>
+      <div class="kpi-foot"><span class="kpi-sub" id="amcCount">—</span></div>
+    </article>
+
+    <article class="kpi-card" style="--accent:var(--color-error);">
+      <div class="kpi-head">
+        <span class="kpi-label">Service outstanding</span>
+        <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6-7.9 7.9-1.6-1.6a1 1 0 0 0-1.4 0L2 18.9 5.1 22l3.3-3.3a1 1 0 0 0 0-1.4l-1.1-1.1 7.9-7.9 1.1 1.1a1 1 0 0 0 1.4 0L22 5.1 18.9 2z"/></svg></div>
+      </div>
+      <div class="kpi-value" id="serviceValue">—</div>
+      <div class="kpi-foot"><span class="kpi-sub" id="serviceCount">—</span></div>
+    </article>
+  </section>
+
+  <section class="panel-grid" aria-label="Charts">
+    <article class="panel">
+      <div class="panel-head">
+        <div><h3>Invoice value by month</h3><p>Outstanding balance trend across billing months</p></div>
+      </div>
+      <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <div><h3>Region mix</h3><p>Outstanding by zone</p></div>
+      </div>
+      <div class="chart-wrap"><canvas id="regionChart"></canvas></div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <div><h3>AMC vs Service</h3><p>Split by invoice type</p></div>
+      </div>
+      <div class="chart-wrap"><canvas id="typeChart"></canvas></div>
+    </article>
+  </section>
+</section>
 
     <section id="view-analytics" class="view-section">
       <div class="hero">

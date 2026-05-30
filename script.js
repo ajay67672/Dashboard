@@ -181,8 +181,6 @@ function renderDashboard() {
   renderRegionChart();
   renderTypeChart();
   renderSparklines();
-  renderAgeingTable();
-  renderInvoiceTable();
   renderAnalytics();
   renderEngineers();
   renderInvoices();
@@ -209,10 +207,103 @@ function renderKPIs() {
 
 function renderTrendChart() {
   const { labels, values } = groupByMonth(filteredRows);
+  const isDark = document.documentElement.dataset.theme === "dark";
+  const axisColor = isDark ? "#8c8a85" : "#9d9a94";
+  const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(40,37,29,0.07)";
+
+  const palette = [
+    { base: "#56b4c8", glow: "rgba(86,180,200,0.25)" },
+    { base: "#8bc34a", glow: "rgba(139,195,74,0.25)" },
+    { base: "#f6a623", glow: "rgba(246,166,35,0.25)" },
+    { base: "#e35d6a", glow: "rgba(227,93,106,0.25)" },
+    { base: "#8c6bd6", glow: "rgba(140,107,214,0.25)" },
+    { base: "#4a90e2", glow: "rgba(74,144,226,0.25)" }
+  ];
+
+  function barGradient(chart, color) {
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return color.base;
+    const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    g.addColorStop(0, color.base);
+    g.addColorStop(0.55, color.base + "cc");
+    g.addColorStop(1, color.base + "55");
+    return g;
+  }
+
   upsertChart("monthChart", {
     type: "bar",
-    data: { labels, datasets: [{ label: "Outstanding", data: values, borderRadius: 10, borderSkipped: false, backgroundColor: CHART_COLORS[0], maxBarThickness: 38 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => " " + compactCurrency(c.raw) } } }, scales: { x: { ticks: { font: { size: 11 } }, grid: { display: false } }, y: { ticks: { font: { size: 11 }, callback: v => compactCurrency(v) }, grid: { } } } }
+    data: {
+      labels,
+      datasets: [{
+        label: "Outstanding",
+        data: values,
+        backgroundColor: ctx => barGradient(ctx.chart, palette[ctx.dataIndex % palette.length]),
+        borderColor: ctx => palette[ctx.dataIndex % palette.length].base,
+        borderWidth: 0,
+        borderRadius: 0,
+        borderSkipped: false,
+        maxBarThickness: 35,
+        categoryPercentage: 0.72,
+        barPercentage: 0.80,
+        hoverBackgroundColor: ctx => palette[ctx.dataIndex % palette.length].base,
+        hoverBorderColor: "#ffffff",
+        hoverBorderWidth: 2,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowBlur: 12,
+        shadowColor: ctx => palette[ctx.dataIndex % palette.length].glow
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onHover: (evt, elements) => {
+        evt.native.target.style.cursor = elements.length ? "pointer" : "default";
+      },
+      onClick: (evt, elements) => {
+        if (!elements.length) {
+          if (typeof filterState !== "undefined") {
+            filterState.month = "";
+            applyFilters();
+          }
+          return;
+        }
+        const idx = elements[0].index;
+        if (typeof filterState !== "undefined") {
+          filterState.month = labels[idx];
+          applyFilters();
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? "rgba(24,23,20,0.95)" : "rgba(255,255,255,0.95)",
+          titleColor: isDark ? "#f5f4f0" : "#28251d",
+          bodyColor: isDark ? "#d1cfcc" : "#28251d",
+          borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(40,37,29,0.10)",
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: c => " " + compactCurrency(c.raw)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: axisColor, font: { size: 11 } },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: axisColor,
+            font: { size: 11 },
+            callback: v => compactCurrency(v)
+          },
+          grid: { color: gridColor }
+        }
+      }
+    }
   });
 }
 
@@ -402,14 +493,26 @@ function upsertChart(id, config) {
 }
 
 function groupByMonth(rows) {
-  const map = {};
+  const map = new Map();
+
   rows.forEach(r => {
-    const key = `${r.year ?? "?"}-${String(r.monthIndex).padStart(2,"0")}`;
-    if (!map[key]) map[key] = { label: r.month + (r.year ? ` '${String(r.year).slice(2)}` : ""), value: 0, idx: r.monthIndex, year: r.year };
-    map[key].value += r.balance;
+    if (r.year == null) return;
+    const key = `${r.year}-${String(r.monthIndex).padStart(2, "0")}`;
+    const label = `${r.month} '${String(r.year).slice(2)}`;
+    const current = map.get(key) || { key, label, value: 0 };
+    current.value += r.balance;
+    map.set(key, current);
   });
-  const sorted = Object.values(map).sort((a, b) => (a.year ?? 0) - (b.year ?? 0) || a.idx - b.idx);
-  return { labels: sorted.map(x => x.label), values: sorted.map(x => x.value) };
+
+  const top10 = [...map.values()]
+    .sort((a, b) => b.value - a.value)   // highest value first
+    .slice(0, 10)                          // only top 10
+    .sort((a, b) => a.key.localeCompare(b.key)); // chronological order for display
+
+  return {
+    labels: top10.map(x => x.label),
+    values: top10.map(x => x.value)
+  };
 }
 
 function groupAndLimit(rows, field, limit) {
@@ -425,10 +528,31 @@ function groupAndLimit(rows, field, limit) {
   return { labels: [...top.map(x => x[0]), "Others"], values: [...top.map(x => x[1]), others] };
 }
 
-function parseDate(str) {
-  if (!str) return null;
-  const d = new Date(str);
-  return isNaN(d) ? null : d;
+function parseDate(v) {
+  if (!v) return null;
+
+  const s = String(v).trim();
+
+  // DD-MM-YYYY or DD/MM/YYYY
+  const ddmmyyyy = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if (ddmmyyyy) {
+    const [, dd, mm, yyyy] = ddmmyyyy;
+    const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // DD-MM-YY or DD/MM/YY
+  const ddmmyy = s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2})$/);
+  if (ddmmyy) {
+    const [, dd, mm, yy] = ddmmyy;
+    const yyyy = Number(yy) >= 50 ? 1900 + Number(yy) : 2000 + Number(yy);
+    const d = new Date(yyyy, Number(mm) - 1, Number(dd));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // fallback
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 }
 function parseAmount(v) { const n = parseFloat(String(v || "").replace(/[^0-9.-]/g, "")); return isNaN(n) ? 0 : n; }
 function sum(arr, key) { return arr.reduce((s, r) => s + (r[key] || 0), 0); }
